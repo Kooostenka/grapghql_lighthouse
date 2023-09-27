@@ -8,7 +8,11 @@ type Query {
       email: String @eq
     ): User @find
 
-    users: [User!] @paginate(defaultCount: 10)
+    users(
+        orderBy: _ @orderBy(columns: ["updated_at", "name"])
+        where: _ @whereConditions(columns: ["id"])
+    ): [User!] @paginate(defaultCount: 10, type: CONNECTION)
+    usersAll: [User!] @all
 
 
     event(
@@ -21,6 +25,26 @@ type Query {
         id: ID @eq
     ): Ticket @find
     tickets: [Ticket!] @paginate(defaultCount: 10)
+}
+
+type Mutation {
+    createUser(input: CreateUserInput! @spread): User
+    updateUser(id: ID!, name: String, email: String, password: String): User
+    deleteUser(id: ID!): DeleteResponse!
+}
+
+
+
+input CreateUserInput {
+    name: String!
+    email: String!
+    password: String!
+}
+
+
+type DeleteResponse {
+    status: String,
+    message: String
 }
 
 
