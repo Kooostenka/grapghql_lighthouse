@@ -39,31 +39,31 @@ type Mutation {
     refresh: User! @guard(with: ["api"])
 
     createUser(input: CreateUserInput! @spread): User
-    updateUser(id: ID!, name: String, email: String, password: String): User
+    updateUser(id: ID!, name: String @rules(apply: ["email"]), email: String, password: String): User
     deleteUser(id: ID!): DeleteResponse!
 
     "Upload a file that is publicly available."
-    upload(file: Upload!): Image
+    upload(file: Upload! @rules(apply: ["image"])): Image
 }
 
 
 input RegisterInput {
-    name: String!
-    email: String!
-    password: String!
-    password_confirmation: String!
+    name: String! @rules(apply: ["required", "min:1"])
+    email: String! @rules(apply: ["required", "email", "unique:users,email"])
+    password: String! @rules(apply: ["required", "min:8", "confirmed"])
+    password_confirmation: String! @rules(apply: ["required", "min:8"])
 }
 
 
 input LoginInput {
-    email: String!
-    password: String!
+    email: String! @rules(apply: ["required", "email", "unique:users,email"])
+    password: String! @rules(apply: ["required", "min:8", "confirmed"])
 }
 
 input CreateUserInput {
-    name: String!
-    email: String!
-    password: String!
+    name: String! @rules(apply: ["min:1"])
+    email: String! @rules(apply: ["email"])
+    password: String! @rules(apply: ["min:8"])
 }
 
 
