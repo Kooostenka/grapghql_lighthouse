@@ -6,6 +6,9 @@ scalar Upload @scalar(class: "Nuwave\\Lighthouse\\Schema\\Types\\Scalars\\Upload
 
 "Indicates what fields are available at the top level of a query operation."
 type Query {
+
+    me: User @guard(with: ["api"])
+
     user(
       id: ID @eq
       email: String @eq
@@ -14,7 +17,7 @@ type Query {
     users(
         orderBy: _ @orderBy(columns: ["updated_at", "name"])
         where: _ @whereConditions(columns: ["id"])
-    ): [User!] @paginate(defaultCount: 10, type: CONNECTION)
+    ): [User!] @paginate(defaultCount: 10, type: CONNECTION) @guard(with: ["api"])
     usersAll: [User!] @all
 
 
@@ -31,6 +34,10 @@ type Query {
 }
 
 type Mutation {
+    login(input: LoginInput! @spread): User!
+    register(input: RegisterInput! @spread): User!
+    refresh: User! @guard(with: ["api"])
+
     createUser(input: CreateUserInput! @spread): User
     updateUser(id: ID!, name: String, email: String, password: String): User
     deleteUser(id: ID!): DeleteResponse!
@@ -40,6 +47,18 @@ type Mutation {
 }
 
 
+input RegisterInput {
+    name: String!
+    email: String!
+    password: String!
+    password_confirmation: String!
+}
+
+
+input LoginInput {
+    email: String!
+    password: String!
+}
 
 input CreateUserInput {
     name: String!
@@ -94,4 +113,8 @@ type User {
     updated_at: DateTime!
 
     tickets: [Ticket!]
+
+    api_token: String!
+
+    expired_at: String!
 }
